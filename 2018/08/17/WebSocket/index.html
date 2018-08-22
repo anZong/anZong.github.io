@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="tech," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="宗安的个人博客" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="WebSocket协议的使用方法 引用自阮一峰的博客  http协议通信只能由客户端发起   websocket没有产生之前，客户端要实时获取服务器状态，只能采用轮询的方式。应用场景：聊天室  websocket诞生于2008年，2011年成为国际标准  特点：服务器可以向客户端推送消息，客户端也可以向服务器推送，实现双向通信。属于服务器推送技术的一种。 http和websocket的对比 特点：">
+<meta name="keywords" content="tech">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebSocket">
+<meta property="og:url" content="http://zongan.live/2018/08/17/WebSocket/index.html">
+<meta property="og:site_name" content="宗安的个人博客">
+<meta property="og:description" content="WebSocket协议的使用方法 引用自阮一峰的博客  http协议通信只能由客户端发起   websocket没有产生之前，客户端要实时获取服务器状态，只能采用轮询的方式。应用场景：聊天室  websocket诞生于2008年，2011年成为国际标准  特点：服务器可以向客户端推送消息，客户端也可以向服务器推送，实现双向通信。属于服务器推送技术的一种。 http和websocket的对比 特点：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://7xosur.com1.z0.glb.clouddn.com//image/blog/http_problems.jpg">
+<meta property="og:image" content="http://7xosuw.com1.z0.glb.clouddn.com/image/blog/http_vs_socket.png">
+<meta property="og:image" content="http://7xosuw.com1.z0.glb.clouddn.com/image/blog/https_wss.jpg">
+<meta property="og:updated_time" content="2018-08-17T06:08:57.585Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WebSocket">
+<meta name="twitter:description" content="WebSocket协议的使用方法 引用自阮一峰的博客  http协议通信只能由客户端发起   websocket没有产生之前，客户端要实时获取服务器状态，只能采用轮询的方式。应用场景：聊天室  websocket诞生于2008年，2011年成为国际标准  特点：服务器可以向客户端推送消息，客户端也可以向服务器推送，实现双向通信。属于服务器推送技术的一种。 http和websocket的对比 特点：">
+<meta name="twitter:image" content="http://7xosur.com1.z0.glb.clouddn.com//image/blog/http_problems.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://zongan.live/2018/08/17/WebSocket/"/>
+
+
+
+
+
+  <title>WebSocket | 宗安的个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">宗安的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">千里之行，始于足下</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://zongan.live/2018/08/17/WebSocket/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Zong An">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="宗安的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WebSocket</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-17T14:08:57+08:00">
+                2018-08-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/网络通信/" itemprop="url" rel="index">
+                    <span itemprop="name">网络通信</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="WebSocket协议的使用方法"><a href="#WebSocket协议的使用方法" class="headerlink" title="WebSocket协议的使用方法"></a>WebSocket协议的使用方法</h1><blockquote>
+<p>引用自<a href="http://www.ruanyifeng.com/blog/2017/05/websocket.html" target="_blank" rel="noopener">阮一峰的博客</a></p>
+<p> http协议通信只能由客户端发起</p>
+</blockquote>
+<p><img src="http://7xosur.com1.z0.glb.clouddn.com//image/blog/http_problems.jpg" alt="image"></p>
+<p>websocket没有产生之前，客户端要实时获取服务器状态，只能采用轮询的方式。应用场景：聊天室</p>
+<blockquote>
+<p>websocket诞生于2008年，2011年成为国际标准</p>
+</blockquote>
+<p>特点：服务器可以向客户端推送消息，客户端也可以向服务器推送，实现双向通信。属于服务器推送技术的一种。</p>
+<h2 id="http和websocket的对比"><a href="#http和websocket的对比" class="headerlink" title="http和websocket的对比"></a>http和websocket的对比</h2><p><img src="http://7xosuw.com1.z0.glb.clouddn.com/image/blog/http_vs_socket.png" alt="image"></p>
+<h4 id="特点："><a href="#特点：" class="headerlink" title="特点："></a>特点：</h4><p>1.建立在 TCP 协议之上，服务器端的实现比较容易。<br>2.与 HTTP 协议有着良好的兼容性。默认端口也是80和443，并且握手阶段采用 HTTP协议，因此握手时不容易屏蔽，能通过各种 HTTP 代理服务器。<br>3.数据格式比较轻量，性能开销小，通信高效。<br>4.可以发送文本，也可以发送二进制数据。<br>5.没有同源限制，客户端可以与任意服务器通信。<br>6.协议标识符是ws（如果加密，则为wss），服务器网址就是 URL。   </p>
+<h4 id="https和wss"><a href="#https和wss" class="headerlink" title="https和wss"></a>https和wss</h4><p><img src="http://7xosuw.com1.z0.glb.clouddn.com/image/blog/https_wss.jpg" alt="image"></p>
+<a id="more"></a>
+<h2 id="客户端实现"><a href="#客户端实现" class="headerlink" title="客户端实现"></a>客户端实现</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">var ws = new WebSocket(&quot;wss://echo.websocket.org&quot;);</span><br><span class="line"></span><br><span class="line">ws.onopen = function(evt) &#123; </span><br><span class="line">  console.log(&quot;Connection open ...&quot;); </span><br><span class="line">  ws.send(&quot;Hello WebSockets!&quot;);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">ws.onmessage = function(evt) &#123;</span><br><span class="line">  console.log( &quot;Received Message: &quot; + evt.data);</span><br><span class="line">  ws.close();</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">ws.onclose = function(evt) &#123;</span><br><span class="line">  console.log(&quot;Connection closed.&quot;);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="客户端API"><a href="#客户端API" class="headerlink" title="客户端API"></a>客户端API</h3><p>1、WebSocket构造函数<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var ws =new WebSocket(&apos;ws://localhost:8080&apos;);</span><br></pre></td></tr></table></figure></p>
+<p>ws所有的方法和属性参见<a href="https://developer.mozilla.org/en-US/docs/Web/API/WebSocket#Method_overview" target="_blank" rel="noopener">这里</a></p>
+<p>2、WebSocket.readyState<br>共有四种：      </p>
+<ul>
+<li>CONNECTING：值为0，表示正在连接。       </li>
+<li>OPEN：值为1，表示连接成功，可以通信了。     </li>
+<li>CLOSING：值为2，表示连接正在关闭。      </li>
+<li>CLOSED：值为3，表示连接已经关闭，或者打开连接失败。  </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">switch (ws.readyState) &#123;</span><br><span class="line">  case WebSocket.CONNECTING:</span><br><span class="line">    // do something</span><br><span class="line">    break;</span><br><span class="line">  case WebSocket.OPEN:</span><br><span class="line">    // do something</span><br><span class="line">    break;</span><br><span class="line">  case WebSocket.CLOSING:</span><br><span class="line">    // do something</span><br><span class="line">    break;</span><br><span class="line">  case WebSocket.CLOSED:</span><br><span class="line">    // do something</span><br><span class="line">    break;</span><br><span class="line">  default:</span><br><span class="line">    // this never happens</span><br><span class="line">    break;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3、WebSocket监听事件</p>
+<ul>
+<li><p>ws.onopen()<br>  指定连接成功后的回调函数</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ws.onopen = function()&#123;</span><br><span class="line">    ws.send(&apos;Hello Server!&apos;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ws.onclose()<br>  指定关闭连接后的回调函数</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ws.onclose = function(evt)&#123;</span><br><span class="line">    var code = event.code;</span><br><span class="line">    var reason = event.reason;</span><br><span class="line">    var wasClean = event.wasClean;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ws.onmessage()<br>  指定收到服务器数据后的回调函数</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">ws.onmessage = function(event) &#123;</span><br><span class="line">    var data = event.data;</span><br><span class="line">    // 处理数据,有可能收到的是二进制数据</span><br><span class="line">    if(typeof data === String) &#123;</span><br><span class="line">        console.log(&quot;Received data string&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if(data instanceof ArrayBuffer)&#123;</span><br><span class="line">        var buffer = data;</span><br><span class="line">        console.log(&quot;Received arraybuffer&quot;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>  除了动态判断收到的数据类型，也可以使用==binaryType==属性，显式指定收到的二进制数据类型。</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 收到的是 blob 数据</span><br><span class="line">ws.binaryType = &quot;blob&quot;;</span><br><span class="line">ws.onmessage = function(e) &#123;</span><br><span class="line">  console.log(e.data.size);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">// 收到的是 ArrayBuffer 数据</span><br><span class="line">ws.binaryType = &quot;arraybuffer&quot;;</span><br><span class="line">ws.onmessage = function(e) &#123;</span><br><span class="line">  console.log(e.data.byteLength);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ws.onerror()<br>  实例对象的onerror属性，用于指定报错时的回调函数。</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">socket.onerror = function(event) &#123;</span><br><span class="line">  // handle error event</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>4、WebSocket的方法</p>
+<ul>
+<li>ws.send()<br>  实例对象的send()方法用于向服务器发送数据  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">(1)发送文本</span><br><span class="line"></span><br><span class="line">    ws.send(&apos;your message&apos;);</span><br><span class="line"></span><br><span class="line">(2)发送Blob对象(发送文件)</span><br><span class="line"></span><br><span class="line">    var file = document</span><br><span class="line">      .querySelector(&apos;input[type=&quot;file&quot;]&apos;)</span><br><span class="line">      .files[0];</span><br><span class="line">    ws.send(file);</span><br><span class="line">    </span><br><span class="line">(3)发送ArrayBuffer对象(发送图片等二进制)</span><br><span class="line">    </span><br><span class="line">    // Sending canvas ImageData as ArrayBuffer</span><br><span class="line">    var img = canvas_context.getImageData(0, 0, 400, 320);</span><br><span class="line">    var binary = new Uint8Array(img.data.length);</span><br><span class="line">    for (var i = 0; i &lt; img.data.length; i++) &#123;</span><br><span class="line">      binary[i] = img.data[i];</span><br><span class="line">    &#125;</span><br><span class="line">    ws.send(binary.buffer);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>5、WebSocket.bufferedAmount<br>实例对象的bufferedAmount属性，表示还有多少字节的二进制数据没有发送出去。它可以用来判断发送是否结束。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var data = new ArrayBuffer(10000000);</span><br><span class="line">socket.send(data);</span><br><span class="line"></span><br><span class="line">if (socket.bufferedAmount === 0) &#123;</span><br><span class="line">  // 发送完毕</span><br><span class="line">&#125; else &#123;</span><br><span class="line">  // 发送还没结束</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="服务端实现"><a href="#服务端实现" class="headerlink" title="服务端实现"></a>服务端实现</h2><p>查看<a href="https://en.wikipedia.org/wiki/Comparison_of_WebSocket_implementations" target="_blank" rel="noopener">wiki</a>文档</p>
+<p>常见Node实现的三种方案：</p>
+<ul>
+<li><a href="https://github.com/uNetworking/uWebSockets" target="_blank" rel="noopener">µWebSockets</a></li>
+<li><a href="https://socket.io/" target="_blank" rel="noopener">Socket.IO</a></li>
+<li><a href="https://github.com/theturtle32/WebSocket-Node" target="_blank" rel="noopener">WebSocket-Node</a></li>
+</ul>
+<h3 id="Python实现"><a href="#Python实现" class="headerlink" title="Python实现"></a>Python实现</h3><p><a href="http://www.360doc.com/content/16/1228/09/1355383_618340627.shtml" target="_blank" rel="noopener">socket握手</a>         </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">配置：</span><br><span class="line">config = &#123;</span><br><span class="line">    &apos;HOST&apos;:&apos;127.0.0.1&apos;,</span><br><span class="line">    &apos;PORT&apos;:8888,</span><br><span class="line">    &apos;LISTEN_CLIENT&apos;:10,</span><br><span class="line">    &apos;KEY&apos;:&apos;391f10fadc339e9ec5fa15af60030ac1&apos;,</span><br><span class="line">    &apos;SIZE&apos;:1024,</span><br><span class="line">    &apos;GUID&apos;:&apos;258EAFA5-E914-47DA-95CA-C5AB0DC85B11&apos;,</span><br><span class="line">    &apos;TIME_OUT&apos;:1000,</span><br><span class="line">    &apos;HANDSHAKE_STRING&apos;:&quot;HTTP/1.1 101 Switching Protocols\r\n&quot; \</span><br><span class="line">                        &quot;Upgrade:websocket\r\n&quot; \</span><br><span class="line">                        &quot;Connection: Upgrade\r\n&quot; \</span><br><span class="line">                        &quot;Sec-WebSocket-Accept: &#123;1&#125;\r\n&quot; \</span><br><span class="line">                        &quot;WebSocket-Location: ws://&#123;2&#125;/chat\r\n&quot; \</span><br><span class="line">                        &quot;WebSocket-Protocol:chat\r\n\r\n&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>1、服务端创建和销毁socket</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line">//TCP</span><br><span class="line"> ws = socket.socket(AF_INET,SOCK_STREAM)</span><br><span class="line">//UDP</span><br><span class="line"> ws = socket.socket(AF_INET,SOCK_DGRAM)</span><br><span class="line"></span><br><span class="line">//关闭socket</span><br><span class="line"> ws.close()</span><br><span class="line"> 或者</span><br><span class="line"> ws.shutdown(arg)</span><br><span class="line">    0:阻止socket 接收数据</span><br><span class="line">    1:阻止发送</span><br><span class="line">    2:阻止接收和发送</span><br></pre></td></tr></table></figure>
+<p>2、绑定IP：端口<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//监听本地8080端口发过来的数据</span><br><span class="line">ws.bind(&apos;127.0.0.1&apos;,8080)</span><br><span class="line">//监听任何IP地址的8080端口</span><br><span class="line">ws.bind(&apos;&apos;,8080)</span><br></pre></td></tr></table></figure></p>
+<p>3、监听<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//监听数量,这个数值表示在等待队列中允许放置的进来的连接总数。当等待队列已满时，如果有更多的连接到达，那么远程端将被告知连接被拒绝</span><br><span class="line">ws.listen(5)</span><br></pre></td></tr></table></figure></p>
+<p>4、接收数据<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">循环监听</span><br><span class="line">white True:</span><br><span class="line">    #   接收数据，返回socket q(data) 和 地址v(ip:port)   </span><br><span class="line">    client,address = ws.accept()</span><br></pre></td></tr></table></figure></p>
+<h3 id="Python实现客户端"><a href="#Python实现客户端" class="headerlink" title="Python实现客户端"></a>Python实现客户端</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">import socket</span><br><span class="line"></span><br><span class="line">client = socket.socket(AF_INET,SOCK_STREAM)</span><br><span class="line">client.connect((&apos;127.0.0.1&apos;,8080))</span><br></pre></td></tr></table></figure>
+<p>通信：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ws.send(&apos;hello,I am Server!&apos;)</span><br><span class="line">//recv(bufsize[,flags]),</span><br><span class="line">flags:</span><br><span class="line">   MSG_OOB:处理带外数据（既TCP紧急数据）。</span><br><span class="line">   MSG_DONTROUTE:不使用路由表；直接发送到接口。</span><br><span class="line">   MSG_PEEK:返回等待的数据且不把它们从队列中删除。</span><br><span class="line">q.recv(1024)</span><br></pre></td></tr></table></figure></p>
+<h2 id="WebSocketd"><a href="#WebSocketd" class="headerlink" title="WebSocketd"></a>WebSocketd</h2><p>WebSocket服务器：<a href="http://websocketd.com/" target="_blank" rel="noopener">WebSocketd</a></p>
+<blockquote>
+<p>后台脚本不限语言，标准输入（stdin）就是 WebSocket 的输入，标准输出（stdout）就是 WebSocket 的输出。</p>
+</blockquote>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tech/" rel="tag"># tech</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/17/SublimeText3快捷键/" rel="next" title="Sublime Text3快捷键大全">
+                <i class="fa fa-chevron-left"></i> Sublime Text3快捷键大全
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/17/easyUI/" rel="prev" title="easyUI">
+                easyUI <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Zong An</p>
+              <p class="site-description motion-element" itemprop="description">道可道，非常道；名可名，非常名。</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">39</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">10</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#WebSocket协议的使用方法"><span class="nav-number">1.</span> <span class="nav-text">WebSocket协议的使用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#http和websocket的对比"><span class="nav-number">1.1.</span> <span class="nav-text">http和websocket的对比</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#特点："><span class="nav-number">1.1.0.1.</span> <span class="nav-text">特点：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#https和wss"><span class="nav-number">1.1.0.2.</span> <span class="nav-text">https和wss</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#客户端实现"><span class="nav-number">1.2.</span> <span class="nav-text">客户端实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端API"><span class="nav-number">1.2.1.</span> <span class="nav-text">客户端API</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务端实现"><span class="nav-number">1.3.</span> <span class="nav-text">服务端实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Python实现"><span class="nav-number">1.3.1.</span> <span class="nav-text">Python实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Python实现客户端"><span class="nav-number">1.3.2.</span> <span class="nav-text">Python实现客户端</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WebSocketd"><span class="nav-number">1.4.</span> <span class="nav-text">WebSocketd</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zong An</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
